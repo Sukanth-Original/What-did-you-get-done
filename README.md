@@ -1,4 +1,4 @@
-# 🧠 What Did You Get Done?
+# What Did You Get Done?
 
 > **Designed for SmartGlasses**
 
