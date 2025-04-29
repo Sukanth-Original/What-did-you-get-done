@@ -1,6 +1,6 @@
-# 🚀 what-did-you-get-done?
+# What did you get done?
 
-> *Designed for SmartGlasses – Track your time like Elon would.*
+> *Designed for SmartGlasses*
 
 🗓 What did you get done this **week**?  
 📅 What did you get done **today**?  
