@@ -11,7 +11,7 @@ def get_active_reminders(username):
     Process memory units for a specific user and return active reminders.
     
     Args:
-        username (str): The username (e.g., "ontelligency_gmail_com")
+        username (str): The username (e.g., "")
         
     Returns:
         list: List of active tasks as strings
