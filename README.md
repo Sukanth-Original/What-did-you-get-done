@@ -1,15 +1,26 @@
-# my-first-augmentos-app
+# 🧠 what-did-you-get-done?
 
-To install dependencies:
+**Designed for SmartGlasses**
 
-```bash
-bun install
-```
+---
 
-To run:
+## 🗓️ What did you get done this week?
 
-```bash
-bun run index.ts
-```
+## 📅 What did you get done today?
 
-This project was created using `bun init` in bun v1.2.8. [Bun](https://bun.sh) is a fast all-in-one JavaScript runtime.
+## ⏱️ What did you get done in the last 15 minutes?
+
+---
+
+**AI version of Elon** asks you, every 15 minutes (or the time limit you choose).
+
+✅ Helps you **store and remember reminders** from casual conversations with the AI.  
+📈 Track your **productivity** and the **stuff you got done**, including **how** you got it done.
+
+---
+
+So when someone asks you:
+
+> **"What did you get done this week?"**
+
+Ask **Elon**, your personal AI.
