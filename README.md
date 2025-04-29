@@ -1,26 +1,28 @@
-# 🧠 what-did-you-get-done?
+# 🚀 what-did-you-get-done?
 
-**Designed for SmartGlasses**
-
----
-
-## 🗓️ What did you get done this week?
-
-## 📅 What did you get done today?
-
-## ⏱️ What did you get done in the last 15 minutes?
+> *Designed for SmartGlasses – Track your time like Elon would.*
 
 ---
 
-**AI version of Elon** asks you, every 15 minutes (or the time limit you choose).
-
-✅ Helps you **store and remember reminders** from casual conversations with the AI.  
-📈 Track your **productivity** and the **stuff you got done**, including **how** you got it done.
+### 🗓 What did you get done this **week**?  
+### 📅 What did you get done **today**?  
+### ⏱ What did you get done in the **last 15 minutes**?
 
 ---
 
-So when someone asks you:
+An AI version of **Elon** checks in with you every 15 minutes (or a time limit you choose).
 
-> **"What did you get done this week?"**
+It helps you:
+- 🧠 Remember casual reminders from your AI conversations  
+- ✅ Track productivity and completions  
+- 🔍 Reflect on *how* you got things done  
 
-Ask **Elon**, your personal AI.
+---
+
+When someone asks:
+
+> “**What did you get done this week?**”
+
+You ask **Elon**, your personal AI.
+
+---
