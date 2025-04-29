@@ -1,6 +1,6 @@
 # What Did You Get Done?
 
-> **Designed for SmartGlasses**
+> **Designed for SmartGlasses 😎**
 
 An AI version of **Elon** checks in with you every 15 minutes (or a time limit you choose).
 
