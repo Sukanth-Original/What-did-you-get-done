@@ -13,16 +13,16 @@
 An AI version of **Elon** checks in with you every 15 minutes (or a time limit you choose).
 
 It helps you:
-- 🧠 Remember casual reminders from your AI conversations  
+- 🧠 Remember reminders from your AI conversations  
 - ✅ Track productivity and completions  
 - 🔍 Reflect on *how* you got things done  
 
 ---
 
-When someone asks:
+So when someone asks:
 
 > “**What did you get done this week?**”
 
-You ask **Elon**, your personal AI.
+You ask **Elon**
 
 ---
