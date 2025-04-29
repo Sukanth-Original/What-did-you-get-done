@@ -11,7 +11,7 @@ It helps you:
 
 ---
 
-## 🗓 Check-In Prompts
+## Check-In Prompts
 
 All questions ultimately boil down to:
 
