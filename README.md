@@ -13,11 +13,11 @@ It helps you:
 
 ## Check-In Prompts
 
-All questions ultimately boil down to:
+Boils down to:
 
 - **What did you get done in the last 15 minutes?**
 
-Whether it's:
+To know:
 
 - **What did you get done this week?**  
 - **What did you get done today?**
@@ -26,7 +26,7 @@ So when someone asks:
 
 > “**What did you get done this week?**”
 
-You can ask **Elon**.
+You can ask **Elon** - *"What did I get done this week?"*.
 
 ---
 
