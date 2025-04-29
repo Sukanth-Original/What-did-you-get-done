@@ -13,9 +13,14 @@ It helps you:
 
 ## 🗓 Check-In Prompts
 
-- **What did you get done this week?**  
-- **What did you get done today?**  
+All questions ultimately boil down to:
+
 - **What did you get done in the last 15 minutes?**
+
+Whether it's:
+
+- **What did you get done this week?**  
+- **What did you get done today?**
 
 So when someone asks:
 
@@ -25,7 +30,7 @@ You can ask **Elon**.
 
 ---
 
-## 🧩 System Overview
+## System Overview
 
 This is a personal assistant system that runs on smart glasses, designed to track and remind users of tasks while maintaining conversation history and memory. The system has four main components:
 
@@ -91,7 +96,7 @@ Identifies and surfaces active tasks:
 
 ---
 
-## 🔄 Overall System Flow
+## Overall System Flow
 
 1. User speaks to smart glasses, triggering the hotword **"Elon"**
 2. `index.ts` captures speech and forwards it to `llm.py`
