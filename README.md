@@ -25,6 +25,7 @@ You can ask **Elon**.
 
 
 System Overview
+
 This is a personal assistant system that runs on smart glasses, designed to track and remind users of tasks while maintaining conversation history and memory. The system has four main components:
 
 1. index.ts - A Node.js server handling real-time user sessions on smart glasses
