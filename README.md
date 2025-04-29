@@ -19,7 +19,7 @@ So when someone asks:
 
 > “**What did you get done this week?**”
 
-You ask **Elon**
+You can ask **Elon**.
 
 ---
 
