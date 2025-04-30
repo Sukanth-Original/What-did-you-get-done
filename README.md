@@ -140,5 +140,5 @@ Terminal 3: Start the LLM FastAPI Backend
 
 Purpose: Runs llm.py as a FastAPI server to handle smartglass prompts and memory processing.
 
-
+---
 *A Sukanth Original Design, 2025*
