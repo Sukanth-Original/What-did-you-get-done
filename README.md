@@ -112,7 +112,7 @@ Identifies and surfaces active tasks:
 
 Reference: https://docs.augmentos.org/getting-started
 
-Terminal 1: Expose Local Server via Ngrok
+### Terminal 1: Expose Local Server via Ngrok
 
 `ngrok http --domain=your-custom-name.ngrok-free.app 80`
 
@@ -121,7 +121,7 @@ Purpose: Creates a public HTTPS endpoint for your local server.
 
 Ensure that ngrok is installed and authed.
 
-Terminal 2: Build and Start SmartGlasses App UI
+### Terminal 2: Build and Start SmartGlasses App UI
 
 `bun run build`
 
@@ -131,7 +131,7 @@ Terminal 2: Build and Start SmartGlasses App UI
 Purpose: Bundles and launches your index.ts interface (real-time user interaction).
 
 
-Terminal 3: Start the LLM FastAPI Backend
+### Terminal 3: Start the LLM FastAPI Backend
 
 `cd llm`
 
