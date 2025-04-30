@@ -114,6 +114,8 @@ Reference: https://docs.augmentos.org/getting-started
 Terminal 1: Expose Local Server via Ngrok
 
 `ngrok http --domain=your-custom-name.ngrok-free.app 80`
+
+
 Purpose: Creates a public HTTPS endpoint for your local server.
 
 Ensure that ngrok is installed and authed.
@@ -121,7 +123,9 @@ Ensure that ngrok is installed and authed.
 Terminal 2: Build and Start SmartGlasses App UI
 
 `bun run build`
+
 `bun run start`
+
 
 Purpose: Bundles and launches your index.ts interface (real-time user interaction).
 
@@ -129,7 +133,9 @@ Purpose: Bundles and launches your index.ts interface (real-time user interactio
 Terminal 3: Start the LLM FastAPI Backend
 
 `cd llm`
+
 `uvicorn llm:app --host 0.0.0.0 --port 8000`
+
 
 Purpose: Runs llm.py as a FastAPI server to handle smartglass prompts and memory processing.
 
