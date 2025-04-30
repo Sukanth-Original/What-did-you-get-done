@@ -133,7 +133,7 @@ Purpose: Bundles and launches your index.ts interface (real-time user interactio
 
 ### Terminal 3: Start the LLM FastAPI Backend
 
-`cd llm`
+`cd memory`
 
 `uvicorn llm:app --host 0.0.0.0 --port 8000`
 
