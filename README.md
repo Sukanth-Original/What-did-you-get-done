@@ -108,7 +108,8 @@ Identifies and surfaces active tasks:
 
 ---
 
-###To run this locally in your server:
+## To run this locally in your server:
+
 Reference: https://docs.augmentos.org/getting-started
 
 Terminal 1: Expose Local Server via Ngrok
