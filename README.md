@@ -107,4 +107,37 @@ Identifies and surfaces active tasks:
 7. Scheduled check-ins continue every 15 minutes
 
 ---
+
+To run your SmartGlasses app locally with the given setup (assuming you've completed initialization via AugmentOS Dev Console), follow these exact terminal commands and sequencing:
+
+✅ Terminal 1: Expose Local Server via Ngrok
+bash
+Copy
+Edit
+ngrok http --domain=your-custom-name.ngrok-free.app 80
+Purpose: Creates a public HTTPS endpoint for your local server.
+
+Ensure that ngrok is installed and authed.
+
+✅ Terminal 2: Build and Start SmartGlasses App UI
+bash
+Copy
+Edit
+bun run build
+bun run start
+Purpose: Bundles and launches your index.ts interface (real-time user interaction).
+
+Ensure bun is installed.
+
+✅ Terminal 3: Start the LLM FastAPI Backend
+bash
+Copy
+Edit
+cd llm
+uvicorn llm:app --host 0.0.0.0 --port 8000
+Purpose: Runs llm.py as a FastAPI server to handle smartglass prompts and memory processing.
+
+Make sure all dependencies are installed (e.g. pip install -r requirements.txt inside the llm/ directory).
+
+
 *A Sukanth Original Design, 2025*
