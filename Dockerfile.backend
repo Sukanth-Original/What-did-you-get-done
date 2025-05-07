@@ -1,0 +1,21 @@
+# file: Dockerfile.backend
+FROM python:3.10-slim
+
+WORKDIR /app
+
+# Install dependencies
+COPY memory/requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copy memory-related scripts
+COPY memory/ ./memory/
+
+ENV PYTHONPATH="/app/memory:${PYTHONPATH}"
+
+EXPOSE 8000
+
+# load your .env
+ENV DOTENV_PATH=/app/mentra.env
+
+# Start FastAPI server for llm.py
+CMD ["uvicorn", "llm:app", "--host", "0.0.0.0", "--port", "8000", "--app-dir", "memory"]

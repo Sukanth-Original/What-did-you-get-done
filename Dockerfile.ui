@@ -1,0 +1,16 @@
+# file: Dockerfile.ui
+FROM oven/bun:latest
+
+WORKDIR /app
+
+# Install dependencies
+COPY package.json bun.lockb* ./
+RUN bun install
+
+# Copy app source
+COPY . .
+
+# Expose port (index.ts listens on 80)
+EXPOSE 80
+
+CMD ["bun", "start"]

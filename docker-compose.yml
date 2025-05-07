@@ -1,0 +1,37 @@
+services:
+  ui:
+    build: 
+      context: .
+      dockerfile: Dockerfile.ui
+    ports:
+      - "8080:80"
+    volumes:
+      - .:/app
+    depends_on:
+      - backend
+
+
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
+    ports:
+      - "8000:8000"
+    volumes:
+      - .:/app
+    env_file:
+      - mentra.env
+
+    command: uvicorn llm:app --host 0.0.0.0 --port 8000
+
+  ngrok:
+    image: ngrok/ngrok:latest
+    ports:
+      - "4040:4040"  # Expose ngrok web interface
+    volumes:
+      - .:/app
+    depends_on:
+      - ui
+    env_file:
+      - mentra.env
+    command: http --domain=privately-proper-narwhal.ngrok-free.app ui:80
