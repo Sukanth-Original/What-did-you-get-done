@@ -248,7 +248,7 @@ class MyAugmentOSApp extends TpaServer {
       try {
         const controller = new AbortController();
         const timeoutId = setTimeout(() => controller.abort(), 100000);
-        const response = await fetch('http://localhost:8000/generate', {
+        const response = await fetch('http://backend:8000/generate', {
           method: 'POST', headers: {'Content-Type':'application/json'},
           body: JSON.stringify({ prompt, user_id: userId }),
           signal: controller.signal
