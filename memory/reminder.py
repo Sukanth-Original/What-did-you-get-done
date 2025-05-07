@@ -1,3 +1,5 @@
+# reminder.py
+
 import os
 import json
 import sys
@@ -31,7 +33,7 @@ def get_active_reminders(username):
         return []
     
     # Initialize Google Generative AI client
-    api_key = os.getenv("GOOGLE_GENAI_API_KEY")
+    api_key = os.getenv("GOOGLE_GENAI_API_KEY2")
     if not api_key:
         print("Error: GOOGLE_GENAI_API_KEY environment variable not set", file=sys.stderr)
         return []
@@ -146,7 +148,7 @@ def print_active_reminders(username):
     Print active reminders for a given user as a numbered list.
     
     Args:
-        username (str): The username (e.g., "ontelligency_gmail_com")
+        username (str): The username (e.g)
     """
     active_reminders = get_active_reminders(username)
     
@@ -161,7 +163,7 @@ def print_active_reminders(username):
 
 if __name__ == "__main__":
     # Default username
-    default_username = "ontelligency_gmail_com"
+    default_username = ""
     
     # Get username from command line argument if provided
     username = sys.argv[1] if len(sys.argv) > 1 else default_username

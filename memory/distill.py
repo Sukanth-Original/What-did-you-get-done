@@ -1,16 +1,23 @@
+# distill.py
+
 import json
 import os
 from datetime import datetime
 from reminder import print_active_reminders
 from dotenv import load_dotenv
-from openai import OpenAI
+
+from google import genai
+from google.genai import types
 
 base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 dotenv_path = os.path.join(base_dir, 'mentra.env')
 load_dotenv(dotenv_path=dotenv_path)
 
+# Replace OpenRouter API key with Gemini API key
+gemini_api_key = os.getenv("GOOGLE_GENAI_API_KEY3")
 
-api_key = os.getenv("OPENROUTER_API_KEY")
+# Initialize the Gemini client
+client = genai.Client(api_key=gemini_api_key)
 
 
 def extract_jsonl_text(filepath):
@@ -72,26 +79,19 @@ def mark_as_processed(tracker_path, file_path):
 
 
 def get_conversation_files(folder_path):
-    """Get all conversation JSONL files from a folder."""
+    """Get all conversation JSONL files from a folder (relative paths)."""
     if not os.path.exists(folder_path):
         print(f"Folder not found: {folder_path}")
         return []
-        
+
     files = []
     for filename in os.listdir(folder_path):
         if filename.startswith("conversation_") and filename.endswith(".jsonl"):
-            files.append(os.path.join(folder_path, filename))
+            files.append(filename)  # Relative filename
     return files
 
 
-client = OpenAI(
-    base_url="https://openrouter.ai/api/v1",
-    api_key=api_key,
-)
-
-
 system_instruction = """
-
 Prompt for Distillation Engine:
 You are a memory extraction engine tasked with distilling essential information from a conversation transcript. Your goal is to create compact, high-value memory nodes that capture important tasks, reminders, and personal context. When multiple related details arise, group them together into a cohesive summary.
 
@@ -209,32 +209,28 @@ Condensing Related Information: When multiple tasks are tied together (e.g., "se
 Proper Categorization: Tasks that are pending are categorized as task: open, tasks that are completed are categorized as task: closed, and personal information or context is categorized as info.
 
 Minimalistic & Efficient: Redundant details (like specifying an action multiple times) are avoided, while key information (like preferences) is included succinctly.
-
-
-
-
 """
 
 
 def graph_memory(system_instruction: str, convo_data: str) -> str:
+    """Generate memory nodes from conversation data using Gemini API."""
     try:
-        completion = client.chat.completions.create(
-            extra_headers={
-                "HTTP-Referer": "<YOUR_SITE_URL>",  # Optional
-                "X-Title": "<YOUR_SITE_NAME>",      # Optional
-            },
-            model="google/gemini-2.0-flash-exp:free",
-            messages=[
-                {"role": "system", "content": system_instruction.strip()},
-                {"role": "user", "content": convo_data.strip()}
-            ]
+        # Create a combined prompt with system instruction and conversation data
+        full_prompt = f"{system_instruction.strip()}\n\nPlease extract memory nodes from the following conversation:\n\n{convo_data.strip()}"
+        
+        # Generate content using Gemini model
+        response = client.models.generate_content(
+            model="gemini-2.0-flash", 
+            contents=full_prompt
         )
-        if completion and completion.choices:
-            return completion.choices[0].message.content
+        
+        # Extract the response text
+        if response and hasattr(response, 'text'):
+            return response.text
         else:
-            return "LLM returned no output or malformed response."
+            return "Gemini returned no output or malformed response."
     except Exception as e:
-        return f"Error during LLM call: {e}"
+        return f"Error during Gemini API call: {e}"
 
 
 def save_memory_graph(json_memory_data, output_path):
@@ -391,7 +387,9 @@ def process_new_conversations(user_id: str):
     print(f"Found {len(new_files)} new conversation file(s) to process for user: {user_id}")
     
     # Process each new file
-    for file_path in new_files:
+    for rel_path in new_files:
+        file_path = os.path.join(conversations_folder, rel_path)
+        
         try:
             print(f"Processing file: {os.path.basename(file_path)}")
             
@@ -400,7 +398,7 @@ def process_new_conversations(user_id: str):
             
             if not convo_data.strip():
                 print(f"Warning: No valid conversation data found in {file_path}")
-                mark_as_processed(tracker_path, file_path)
+                mark_as_processed(tracker_path, rel_path)
                 continue
             
             # Add timestamps to context for the LLM
@@ -424,7 +422,7 @@ def process_new_conversations(user_id: str):
                 print(f"No new memory nodes extracted from {file_path} for user {user_id}")
             
             # Mark file as processed
-            mark_as_processed(tracker_path, file_path)
+            mark_as_processed(tracker_path, rel_path)
             
         except Exception as e:
             print(f"Error processing {file_path} for user {user_id}: {e}")
