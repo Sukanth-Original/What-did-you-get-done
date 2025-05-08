@@ -4,6 +4,9 @@ import json
 import os
 from datetime import datetime
 from reminder import print_active_reminders
+from reminder import print_closed_reminders
+from reminder import print_reminders
+
 from dotenv import load_dotenv
 
 from google import genai
@@ -429,7 +432,7 @@ def process_new_conversations(user_id: str):
     
     print(f"Finished processing {len(new_files)} new conversation file(s) for user {user_id}.")
 
-    print_active_reminders(user_id)
+    print_reminders(user_id)
     print(f"Done processing active reminders")
 
 

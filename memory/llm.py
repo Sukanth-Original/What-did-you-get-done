@@ -1,5 +1,3 @@
-# llm.py
-
 from fastapi import FastAPI, Request, BackgroundTasks
 from pydantic import BaseModel
 import uvicorn
@@ -13,15 +11,18 @@ from dotenv import load_dotenv
 from google import genai
 from google.genai import types
 from distill import process_new_conversations
+from supabase import create_client
+import sys
 
-
-# Load .env file - using the same approach from your working code
+# Load .env file
 base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 dotenv_path = os.path.join(base_dir, 'mentra.env')
 load_dotenv(dotenv_path=dotenv_path)
 
 # Fetch API key from environment variable
 api_key = os.getenv("GOOGLE_GENAI_API_KEY")
+supabase_url = os.getenv("ELON_SUPABASE_URL")
+supabase_service = os.getenv("ELON_SUPABASE_SERVICE")
 
 # Configuration constants
 INACTIVITY_THRESHOLD_MINUTES = 2  # Time threshold to start a new conversation
@@ -29,6 +30,7 @@ INACTIVITY_CHECK_INTERVAL = 60  # Check for inactive conversations every 60 seco
 
 # Initialize the Google GenAI client with the API key
 client = genai.Client(api_key=api_key)
+supabase = create_client(supabase_url, supabase_service)
 
 instruction = """
 You are Elon, a friendly assistant in smart glasses. 
@@ -68,13 +70,6 @@ def get_user_memory_path(user_id: str) -> str:
     os.makedirs(memory_dir, exist_ok=True)
     return os.path.join(memory_dir, f"{sanitized_id}.jsonl")
 
-def get_reminders_path(user_id: str) -> str:
-    """Generate the path to the user-specific reminders file"""
-    sanitized_id = sanitize_user_id(user_id)
-    reminders_dir = os.path.join(base_dir, "reminders", sanitized_id)
-    os.makedirs(reminders_dir, exist_ok=True)
-    return os.path.join(reminders_dir, "open_reminders.txt")
-
 def get_conversation_filename(user_id: str) -> str:
     """Generate a timestamp-based filename for a new conversation"""
     timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
@@ -85,8 +80,21 @@ def get_all_user_ids():
     database_dir = os.path.join(base_dir, "memory", "database")
     if not os.path.exists(database_dir):
         return []
-    
     return os.listdir(database_dir)
+
+def clear_memory(user_id: str) -> str:
+    # Get the path to the user's memory file
+    memory_path = get_user_memory_path(user_id)
+    
+    try:
+        # Open the file in write mode and clear its contents
+        with open(memory_path, "w") as memory_file:
+            memory_file.truncate(0)  # Clear the contents of the file
+        
+        return f"Memory cleared for user {user_id}"
+    except Exception as e:
+        return f"Error clearing memory for user {user_id}: {str(e)}"
+
 
 def check_for_inactive_conversations():
     """Actively check for inactive conversations and process them"""
@@ -103,6 +111,7 @@ def check_for_inactive_conversations():
             print(f"Detected inactivity for user {user_id}, processing conversations...")
             try:
                 process_new_conversations(sanitize_user_id(user_id))
+                clear_memory(sanitize_user_id(user_id))
                 inactive_users.append(user_id)
             except Exception as e:
                 print(f"Error processing conversations for user {user_id}: {e}")
@@ -132,6 +141,7 @@ def check_for_inactive_conversations():
                                 if (time_diff > timedelta(minutes=INACTIVITY_THRESHOLD_MINUTES)):  # Only process recent enough conversations
                                     print(f"Processing forgotten user {user_id}...")
                                     process_new_conversations(user_id)
+                                    clear_memory(user_id)
                     except Exception as e:
                         print(f"Error checking inactive user {user_id}: {e}")
 
@@ -175,17 +185,6 @@ def load_conversation_history(user_id: str):
     """
     user_dir = get_user_dir(user_id)
     
-    # Get user-specific memory file path
-    memory_file_path = get_user_memory_path(user_id)
-    
-    # Load concise memory data before processing the user's prompt
-    memory_data = load_memory_graph(memory_file_path)
-    
-    # Get memory context as string
-    memory_context = ""
-    for memory in memory_data:
-        if "summary" in memory:
-            memory_context += memory["summary"] + "\n"
     
     # Get list of conversation files sorted by timestamp (most recent first)
     files = []
@@ -217,21 +216,41 @@ def load_conversation_history(user_id: str):
             time_difference = datetime.now() - last_timestamp
             start_new_conversation = time_difference > timedelta(minutes=INACTIVITY_THRESHOLD_MINUTES)
     
-    return current_file, start_new_conversation, memory_context, conversation_history
+    return current_file, start_new_conversation, conversation_history
 
-def load_reminders(user_id: str) -> str:
-    """Load active reminders for the user"""
-    reminders_path = get_reminders_path(user_id)
-    reminder_information = ""
-    
-    if os.path.exists(reminders_path):
-        try:
-            with open(reminders_path, "r") as f:
-                reminder_information = f.read().strip()
-        except Exception as e:
-            print(f"Error reading reminders: {e}")
-    
-    return reminder_information
+
+
+def fetch_reminders_from_supabase(user_id: str) -> Tuple[str, str]:
+    """
+    Fetch open and closed reminders for a specific user from Supabase.
+
+    Args:
+        user_id (str): The ID of the user to fetch reminders for.
+
+    Returns:
+        Tuple[str, str]: A tuple containing two strings:
+            - A numbered list of open reminders.
+            - A numbered list of closed reminders.
+    """
+    try:
+        # Fetch open reminders
+        open_reminders_data = supabase.table("open_reminders").select("content").eq("user_id", user_id).execute().data
+        open_reminders = [entry['content'] for entry in open_reminders_data if entry.get('content')]
+
+        # Fetch closed reminders
+        closed_reminders_data = supabase.table("closed_reminders").select("content").eq("user_id", user_id).execute().data
+        closed_reminders = [entry['content'] for entry in closed_reminders_data if entry.get('content')]
+
+        # Format as numbered lists
+        open_reminders_str = "\n".join([f"{i+1}. {reminder}" for i, reminder in enumerate(open_reminders)])
+        closed_reminders_str = "\n".join([f"{i+1}. {reminder}" for i, reminder in enumerate(closed_reminders)])
+
+        return open_reminders_str, closed_reminders_str
+
+    except Exception as e:
+        print(f"Error fetching reminders from Supabase: {e}", file=sys.stderr)
+        return "", ""
+
 
 def store_conversation(user_id: str, prompt: str, response: str, current_file=None, start_new=False):
     """Store conversation in the current timestamp file or create a new one"""
@@ -241,7 +260,6 @@ def store_conversation(user_id: str, prompt: str, response: str, current_file=No
         "response": response
     }
     
-    # Create a new file if needed
     if current_file is None or start_new:
         conversation_file = get_conversation_filename(user_id)
     else:
@@ -252,48 +270,37 @@ def store_conversation(user_id: str, prompt: str, response: str, current_file=No
     
     return os.path.basename(conversation_file)
 
-def load_memory_graph(file_path: str):
-    """Loads memory from a JSONL file and returns as a list of dictionaries."""
-    memory_data = []
-    if os.path.exists(file_path):
-        with open(file_path, "r") as f:
-            for line in f:
-                memory_data.append(json.loads(line))
-    return memory_data
-
 def update_user_activity(user_id: str):
     """Update the last activity timestamp for a user"""
     global active_users
     active_users[user_id] = datetime.now()
+
+
 
 @app.post("/generate")
 async def generate_text(data: PromptRequest, background_tasks: BackgroundTasks):
     # Update user activity timestamp
     update_user_activity(data.user_id)
     
-    # Get user-specific memory file path
-    memory_file_path = get_user_memory_path(data.user_id)
-    
     # Load conversation history and determine if this is a new conversation
-    current_file, start_new_conversation, memory_context, conversation_history = load_conversation_history(
-        data.user_id
-    )
+    current_file, start_new_conversation, conversation_history = load_conversation_history(data.user_id)
     
-    # Load active reminders for this user
-    reminder_information = load_reminders(data.user_id)
-    
-    # For new conversations, just reload memory context
-    # The background thread should have already processed the data
+    open_reminders = ""
+    completed_reminders = ""
+    sanitize_id = sanitize_user_id(data.user_id)
+    open_reminders, completed_reminders = fetch_reminders_from_supabase(sanitize_id)
+
+    if open_reminders is None:
+        open_reminders = "No active reminders"
+
+    if completed_reminders is None:
+        completed_reminders = "No completed tasks"
+
     if start_new_conversation:
-        sanitized_id = sanitize_user_id(data.user_id)
-        print(f"New conversation detected for {sanitized_id}")
-        
-        # Reload memory context for the new conversation
-        memory_data = load_memory_graph(memory_file_path)
-        memory_context = ""
-        for memory in memory_data:
-            if "summary" in memory:
-                memory_context += memory["summary"] + "\n"
+    # Fetch open and closed reminders directly from Supabase
+        print(f"New conversation detected for {sanitize_id}")
+
+
     
     # Define the content generation configuration
     config = types.GenerateContentConfig(
@@ -302,13 +309,13 @@ async def generate_text(data: PromptRequest, background_tasks: BackgroundTasks):
         temperature=0.7,
     )
     
-    # Format a full prompt with context, reminders, and history
+    # Format a full prompt with just the reminders and conversation history
     full_prompt = f"""
-Memory Context:
-{memory_context}
+Completed Tasks:
+{completed_reminders}
 
 Active Reminders:
-{reminder_information}
+{open_reminders}
 
 Previous Conversation:
 {conversation_history}
@@ -326,6 +333,7 @@ Current User Message:
     
     # Extract the response text
     response_text = response.text
+    print(full_prompt)
     
     # Store conversation in current file or create a new one
     current_file = store_conversation(data.user_id, data.prompt, response_text, 
