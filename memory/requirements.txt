@@ -3,3 +3,4 @@ uvicorn
 python-dotenv  # For dotenv support
 google-genai  # For google genai module
 pydantic
+supabase
