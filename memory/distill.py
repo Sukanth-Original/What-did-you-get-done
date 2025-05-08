@@ -426,6 +426,11 @@ def process_new_conversations(user_id: str):
             
             # Mark file as processed
             mark_as_processed(tracker_path, rel_path)
+            try:
+                os.remove(file_path)
+                print(f"Deleted processed file: {file_path}")
+            except Exception as del_err:
+                print(f"Warning: Failed to delete {file_path}: {del_err}")
             
         except Exception as e:
             print(f"Error processing {file_path} for user {user_id}: {e}")
