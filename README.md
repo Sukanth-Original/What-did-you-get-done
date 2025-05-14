@@ -7,7 +7,9 @@ An AI version of **Elon** checks in with you every 15 minutes (or a time limit y
 It helps you:
 - 🧠 Remember reminders from your AI conversations  
 - ✅ Track productivity and completions  
-- 🔍 Reflect on *how* you got things done  
+- 🔍 Reflect on *how* you got things done
+
+Use it here: https://appstore.augmentos.org/package/com.sukanth.augmentmemory
 
 ---
 
